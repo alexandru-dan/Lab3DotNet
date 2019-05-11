@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Lab2.Models;
+using Lab2.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,11 +14,11 @@ namespace Lab2.Controllers
     [ApiController]
     public class ExpensesController : ControllerBase
     {
-        private IntroDbContext context;
+        private IExpensesService expensesService;
 
-        public ExpensesController(IntroDbContext context)
+        public ExpensesController(IExpensesService expensesService)
         {
-            this.context = context;
+            this.expensesService = expensesService;
         }
 
         /// <summary>
@@ -34,28 +35,13 @@ namespace Lab2.Controllers
         /// <param name="to">Optiona, filter by maximum Date</param>
         /// <param name="type">Optional, filter by expenses type</param>
         /// <returns>List of Expenses with/without filters</returns>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpGet]
         public IEnumerable<Expenses> Get([FromQuery]DateTime? from, [FromQuery]DateTime? to, [FromQuery]Models.Type? type)
         {
 
-            IQueryable<Expenses> result = context.Expensess.Include(f => f.Comments);
-            if ((from == null && to == null) && type == null)
-            {
-                return result;
-            }
-            if (from != null)
-            {
-                result = result.Where(f => f.Date >= from);
-            }
-            if (to != null)
-            {
-                result = result.Where(f => f.Date <= to);
-            }
-            if(type != null)
-            {
-                result = result.Where(f => f.Type.Equals(type));
-            }
-            return result;
+            return expensesService.GetAll(from, to, type);
         }
 
         /// <summary>
@@ -69,10 +55,18 @@ namespace Lab2.Controllers
         /// </remark>
         /// <param name="id">Id for the expense we're searching</param>
         /// <returns>Expense that have that id</returns>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpGet("{id}", Name = "Get")]
-        public Expenses Get(int id)
+        public IActionResult Get(int id)
         {
-            return context.Expensess.FirstOrDefault(c => c.Id == id);
+            var found = expensesService.GetById(id);
+            if(found == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(found);
         }
 
         /// <summary>
@@ -104,37 +98,49 @@ namespace Lab2.Controllers
         /// </remarks>
         /// <param name="expenses">expense that we want to add</param>
         /// <returns>returns ok if added</returns>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost]
-        public IActionResult Post([FromBody] Expenses expenses)
+        public void Post([FromBody] Expenses expenses)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-            context.Expensess.Add(expenses);
-            context.SaveChanges();
-            return Ok();
+            expensesService.Create(expenses);
         }
 
-        // PUT: api/Expensess/5
+        /// <summary>
+        /// Add or update expense (upsert)
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///         
+        ///    PUT/    {
+        ///		 "Description" : "Pizza",
+        ///         "Sum" : 48.2,
+        ///         "Location" : "Cluj-Napoca",
+        ///         "Currency" : "Lei",
+        ///         "date" : "2018-05-11T21:20:10",
+        ///         "Type" : 0,
+        ///         "comments" : [
+        ///         	{
+        ///         		"text": "A fost buna",
+        ///         		"important": true
+        ///
+        ///             },
+        ///         	{
+        ///         		"text": "A fost putina",
+        ///         		"important": false
+        ///             }
+        ///         	          ]
+        ///         }
+        /// 
+        /// </remarks>
+        /// <param name="expenses">expense that we want to add or modify</param>
+        /// <returns>returns ok if added</returns>
         [HttpPut("{id}")]
         public IActionResult Put(int id, [FromBody] Expenses expenses)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
+            var result = expensesService.Upsert( id, expenses);
 
-            var existing = context.Expensess.FirstOrDefault(c => c.Id == id);
-            if (existing != null)
-            {
-                expenses.Id = existing.Id;
-                context.Expensess.Remove(existing);
-            }
-
-            context.Expensess.Add(expenses);
-            context.SaveChanges();
-            return Ok();
+            return Ok(result);
         }
         /// <summary>
         /// Delete an expense with a certain id
@@ -147,18 +153,18 @@ namespace Lab2.Controllers
         /// </remarks>
         /// <param name="id">Id for the expense we want to delete</param>
         /// <returns>Ok if it was deleted, nok otherwise</returns>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {
-            var found = context.Expensess.FirstOrDefault(c => c.Id == id);
-            if (found == null)
+            var result = expensesService.Delete(id);
+            if (result == null)
             {
                 return NotFound();
             }
 
-            context.Expensess.Remove(found);
-            context.SaveChanges();
-            return Ok();
+            return Ok(result);
         }
     }
 }

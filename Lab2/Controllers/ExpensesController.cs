@@ -20,7 +20,20 @@ namespace Lab2.Controllers
             this.context = context;
         }
 
-        // GET: api/Expensess
+        /// <summary>
+        /// Get All Expenses
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        /// 
+        ///     GET /api/expenses?from=2019-05-05&&type=food
+        /// 
+        /// 
+        /// </remarks>
+        /// <param name="from">Optional, filter by minimum Date</param>
+        /// <param name="to">Optiona, filter by maximum Date</param>
+        /// <param name="type">Optional, filter by expenses type</param>
+        /// <returns>List of Expenses with/without filters</returns>
         [HttpGet]
         public IEnumerable<Expenses> Get([FromQuery]DateTime? from, [FromQuery]DateTime? to, [FromQuery]Models.Type? type)
         {
@@ -45,14 +58,52 @@ namespace Lab2.Controllers
             return result;
         }
 
-        // GET: api/Expensess/5
+        /// <summary>
+        /// Get Expenses with unique id
+        /// </summary>
+        /// <remark>
+        /// Sample request:
+        /// 
+        ///   GET  /api/Expenses/5 
+        /// 
+        /// </remark>
+        /// <param name="id">Id for the expense we're searching</param>
+        /// <returns>Expense that have that id</returns>
         [HttpGet("{id}", Name = "Get")]
         public Expenses Get(int id)
         {
             return context.Expensess.FirstOrDefault(c => c.Id == id);
         }
 
-        // POST: api/Expensess
+        /// <summary>
+        /// Add expense
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///     
+        ///    POST/    {
+        ///		 "Description" : "Pizza",
+        ///         "Sum" : 48.2,
+        ///         "Location" : "Cluj-Napoca",
+        ///         "Currency" : "Lei",
+        ///         "date" : "2018-05-11T21:20:10",
+        ///         "Type" : 0,
+        ///         "comments" : [
+        ///         	{
+        ///         		"text": "A fost buna",
+        ///         		"important": true
+        ///
+        ///             },
+        ///         	{
+        ///         		"text": "A fost putina",
+        ///         		"important": false
+        ///             }
+        ///         	          ]
+        ///         }
+        /// 
+        /// </remarks>
+        /// <param name="expenses">expense that we want to add</param>
+        /// <returns>returns ok if added</returns>
         [HttpPost]
         public IActionResult Post([FromBody] Expenses expenses)
         {
@@ -85,7 +136,17 @@ namespace Lab2.Controllers
             context.SaveChanges();
             return Ok();
         }
-        // DELETE: api/ApiWithActions/5
+        /// <summary>
+        /// Delete an expense with a certain id
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        ///     
+        ///             api/Expense/2
+        /// 
+        /// </remarks>
+        /// <param name="id">Id for the expense we want to delete</param>
+        /// <returns>Ok if it was deleted, nok otherwise</returns>
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {

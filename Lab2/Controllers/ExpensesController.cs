@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Lab2.Models;
 using Lab2.Services;
+using Lab2.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -26,10 +27,7 @@ namespace Lab2.Controllers
         /// </summary>
         /// <remarks>
         /// Sample request:
-        /// 
         ///     GET /api/expenses?from=2019-05-05&&type=food
-        /// 
-        /// 
         /// </remarks>
         /// <param name="from">Optional, filter by minimum Date</param>
         /// <param name="to">Optiona, filter by maximum Date</param>
@@ -38,7 +36,7 @@ namespace Lab2.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpGet]
-        public IEnumerable<Expenses> Get([FromQuery]DateTime? from, [FromQuery]DateTime? to, [FromQuery]Models.Type? type)
+        public IEnumerable<ExpensesGetModel> Get([FromQuery]DateTime? from, [FromQuery]DateTime? to, [FromQuery]Models.Type? type)
         {
 
             return expensesService.GetAll(from, to, type);
@@ -68,6 +66,8 @@ namespace Lab2.Controllers
 
             return Ok(found);
         }
+
+
 
         /// <summary>
         /// Add expense
@@ -101,7 +101,7 @@ namespace Lab2.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost]
-        public void Post([FromBody] Expenses expenses)
+        public void Post([FromBody] ExpensesPostModel expenses)
         {
             expensesService.Create(expenses);
         }

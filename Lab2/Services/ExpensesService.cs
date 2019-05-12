@@ -22,6 +22,11 @@ namespace Lab2.Services
     {
         private IntroDbContext context;
 
+
+        /// <summary>
+        /// Contructor for Service
+        /// </summary>
+        /// <param name="context">Repo</param>
         public ExpensesService(IntroDbContext context)
         {
             this.context = context;

@@ -14,7 +14,11 @@ namespace Lab2.ViewModels
         public DateTime Date { get; set; }
         public int NumberOfComments { get; set; }
 
-
+        /// <summary>
+        /// Model of what we want to show when call GET
+        /// </summary>
+        /// <param name="expenses">Get all Object</param>
+        /// <returns>Only fields selected</returns>
         public static ExpensesGetModel FromExpenses(Expenses expenses)
         {
             return new ExpensesGetModel

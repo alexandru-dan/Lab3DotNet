@@ -18,6 +18,13 @@ namespace Lab2.ViewModels
         public string Type { get; set; }
         public List<Comment> Comments { get; set; }
 
+
+
+        /// <summary>
+        /// Add model, so we can add Type(ENUM) using letters
+        /// </summary>
+        /// <param name="expenses">Model received from "input"</param>
+        /// <returns>added Expense</returns>
         public static Expenses toExpenses(ExpensesPostModel expenses)
         {
             Type type = Models.Type.Food;

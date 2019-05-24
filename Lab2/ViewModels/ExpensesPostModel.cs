@@ -25,7 +25,7 @@ namespace Lab2.ViewModels
         /// </summary>
         /// <param name="expenses">Model received from "input"</param>
         /// <returns>added Expense</returns>
-        public static Expenses toExpenses(ExpensesPostModel expenses)
+        public static Expenses ToExpenses(ExpensesPostModel expenses)
         {
             Type type = Models.Type.Food;
             if (expenses.Type == "Utilities")

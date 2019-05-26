@@ -22,8 +22,13 @@ namespace Lab3.Services
 
         public IEnumerable<CommentGetModel> GetAll(string filterString)
         {
-            IQueryable<Comment> result = context.Comments.Include(f => f.Expenses);
-            if ()
+            IQueryable<CommentGetModel> result = context
+                .Comments
+                .Where(c => string.IsNullOrEmpty(filterString) || c.Text.Contains(filterString))
+                .OrderBy(c => c.Id)
+                .Select(c => CommentGetModel.FromComments(c));
+
+            return result.ToList();
         }
 
     }

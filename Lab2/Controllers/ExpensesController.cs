@@ -27,16 +27,15 @@ namespace Lab2.Controllers
         /// </summary>
         /// <remarks>
         /// Sample request:
-        ///     GET /api/expenses?from=2019-05-05&&type=food
+        ///     GET /api/expenses?from=2019-05-05
         /// </remarks>
         /// <param name="from">Optional, filter by minimum Date</param>
         /// <param name="to">Optiona, filter by maximum Date</param>
         /// <param name="type">Optional, filter by expenses type</param>
         /// <returns>List of Expenses with/without filters</returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpGet]
-        public IEnumerable<ExpensesGetModel> Get([FromQuery]DateTime? from, [FromQuery]DateTime? to, [FromQuery]Models.Type? type)
+        public IEnumerable<ExpensesGetModel> GetExpenses([FromQuery]DateTime? from, [FromQuery]DateTime? to, [FromQuery]Models.Type? type)
         {
 
             return expensesService.GetAll(from, to, type);
@@ -54,7 +53,7 @@ namespace Lab2.Controllers
         /// <param name="id">Id for the expense we're searching</param>
         /// <returns>Expense that have that id</returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpGet("{id}", Name = "Get")]
         public IActionResult Get(int id)
         {
@@ -101,9 +100,14 @@ namespace Lab2.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost]
-        public void Post([FromBody] ExpensesPostModel expenses)
+        public IActionResult Post([FromBody] ExpensesPostModel expenses)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(expenses);
+            }
             expensesService.Create(expenses);
+            return Ok();
         }
 
         /// <summary>
@@ -136,8 +140,14 @@ namespace Lab2.Controllers
         /// <param name="expenses">expense that we want to add or modify</param>
         /// <returns>returns ok if added</returns>
         [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public IActionResult Put(int id, [FromBody] Expenses expenses)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(expenses);
+            }
             var result = expensesService.Upsert( id, expenses);
 
             return Ok(result);
@@ -154,7 +164,7 @@ namespace Lab2.Controllers
         /// <param name="id">Id for the expense we want to delete</param>
         /// <returns>Ok if it was deleted, nok otherwise</returns>
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpDelete("{id}")]
         public IActionResult Delete(int id)
         {

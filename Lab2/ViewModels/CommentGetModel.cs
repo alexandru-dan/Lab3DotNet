@@ -8,7 +8,7 @@ namespace Lab3.Services
         public int Id { get; set; }
         public string Text { get; set; }
         public bool Important { get; set; }
-        public int? FlowerId { get; set; }
+        public int? ExpensesId { get; set; }
 
         public static CommentGetModel FromComments(Comment comment)
         {
@@ -18,7 +18,7 @@ namespace Lab3.Services
                 Id = comment.Id,
                 Text = comment.Text,
                 Important = comment.Important,
-                FlowerId = 
+                ExpensesId = comment.ExpensesId
             };
         } 
 

@@ -38,7 +38,7 @@ namespace Lab2.Services
         /// <returns>Expense added</returns>
         public ExpensesPostModel Create (ExpensesPostModel expenses)
         {
-            Expenses toAdd = ExpensesPostModel.toExpenses(expenses);
+            Expenses toAdd = ExpensesPostModel.ToExpenses(expenses);
             context.Expensess.Add(toAdd);
             context.SaveChanges();
 
@@ -52,14 +52,16 @@ namespace Lab2.Services
         /// <returns>Expense we gave</returns>
         public Expenses Upsert (int id, Expenses expenses)
         {
-            var existing = context.Expensess.FirstOrDefault(c => c.Id == id);
-            if (existing != null)
+            var existing = context.Expensess.AsNoTracking().Include(c => c.Comments).FirstOrDefault(c => c.Id == id);
+            if (existing == null)
             {
-                expenses.Id = existing.Id;
-                context.Expensess.Remove(existing);
-            }
 
-            context.Expensess.Add(expenses);
+                context.Expensess.Add(expenses);
+                context.SaveChanges();
+                return expenses;
+            }
+            expenses.Id = id;
+            context.Expensess.Update(expenses);
             context.SaveChanges();
             return expenses;
         }
@@ -70,7 +72,7 @@ namespace Lab2.Services
         /// <returns>Deleted expense</returns>
         public Expenses Delete(int id)
         {
-            var found = context.Expensess.FirstOrDefault(c => c.Id == id);
+            var found = context.Expensess.Include(c => c.Comments).FirstOrDefault(c => c.Id == id);
             if (found == null)
             {
                 return null;

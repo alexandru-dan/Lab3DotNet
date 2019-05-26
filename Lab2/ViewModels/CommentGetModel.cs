@@ -10,17 +10,19 @@ namespace Lab3.Services
         public bool Important { get; set; }
         public int? ExpensesId { get; set; }
 
-        public static CommentGetModel FromComments(Comment comment)
-        {
-            return new CommentGetModel
+        
 
-            {
-                Id = comment.Id,
-                Text = comment.Text,
-                Important = comment.Important,
-                ExpensesId = comment.ExpensesId
-            };
-        } 
+        //public static CommentGetModel FromComments(Comment comment)
+        //{
+        //    return new CommentGetModel
+
+        //    {
+        //        Id = comment.Id,
+        //        Text = comment.Text,
+        //        Important = comment.Important,
+        //        ExpensesId = comment.
+        //    };
+        //} 
 
     }
 }

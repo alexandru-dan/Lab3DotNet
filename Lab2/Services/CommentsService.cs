@@ -13,7 +13,7 @@ namespace Lab3.Services
     }
     public class CommentsService : ICommentsService  
     {
-        private IntroDbContext context;
+        public IntroDbContext context;
 
         public CommentsService(IntroDbContext context)
         {
@@ -26,7 +26,14 @@ namespace Lab3.Services
                 .Comments
                 .Where(c => string.IsNullOrEmpty(filterString) || c.Text.Contains(filterString))
                 .OrderBy(c => c.Id)
-                .Select(c => CommentGetModel.FromComments(c));
+                .Select(c => new CommentGetModel() {
+                    Id = c.Id,
+                    Text = c.Text,
+                    Important = c.Important,
+                    ExpensesId = (from e in context.Expensess
+                                  where e.Comments.Contains(c)
+                                  select e.Id).FirstOrDefault()
+                });
 
             return result.ToList();
         }
